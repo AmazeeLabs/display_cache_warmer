@@ -1,0 +1,10 @@
+name = Display Cache Warmer
+description = Warms caches of the Display Cache module..
+core = 7.x
+
+dependencies[] = 'display_cache'
+dependencies[] = 'heisencache'
+
+files[] = includes/DisplayCacheWarmer.inc
+files[] = includes/DisplayCacheWarmerCacheSpec.inc
+files[] = includes/DisplayCacheWarmerException.inc
