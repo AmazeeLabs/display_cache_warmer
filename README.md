@@ -36,7 +36,7 @@ This file is not used until you set the Heisencache as the last cache backend.
     $conf['cache_backends'][] = 'sites/all/modules/redis/redis.autoload.inc';
     
     // Set Heisencache as the last cache backend.
-    $conf['cache_backends'][] = 'sites/all/modules/heisencache/heisencache.inc';
+    $conf['cache_backends'][] = 'sites/all/modules/custom/heisencache/heisencache.inc';
     
     // If you use the Domain Access module, or any other modules that bootstraps
     // the Drupal in the setting.php, the includes of such modules should go
