@@ -277,7 +277,7 @@ class DisplayCacheWarmer {
     }
 
     // Proxy user.
-    if (isset($this->cacheSpec->userId)) {
+    if (!empty($this->cacheSpec->userId)) {
       $user = user_load($this->cacheSpec->userId);
       if (!$user) {
         throw new DisplayCacheWarmerException('Cannot load user for proxy.', $this->cacheSpec);
@@ -313,7 +313,7 @@ class DisplayCacheWarmer {
     }
 
     // Proxy domain and domain variant.
-    if (isset($this->cacheSpec->domainId)) {
+    if (!empty($this->cacheSpec->domainId)) {
       if (!function_exists('domain_load')) {
         throw new DisplayCacheWarmerException('The domain module is not enabled.', $this->cacheSpec);
       }
@@ -323,7 +323,7 @@ class DisplayCacheWarmer {
       }
       $GLOBALS['_domain'] = $domain;
     }
-    if (isset($this->cacheSpec->domainVariantId)) {
+    if (!empty($this->cacheSpec->domainVariantId)) {
       if (!function_exists('domain_variants_load')) {
         throw new DisplayCacheWarmerException('The domain_variants module is not enabled.', $this->cacheSpec);
       }
