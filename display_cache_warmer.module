@@ -46,6 +46,9 @@ function _display_cache_warmer_variable_get($name) {
  */
 function _display_cache_warmer_log() {
   $log =& display_cache_warmer_static();
+  if (!empty($log['logged'])) {
+    return;
+  }
   $time = timer_read('display_cache_warmer');
   if (empty($log['completed'])) {
     watchdog('display_cache_warmer', "The cache warming was not fully completed. Execution time: $time.", array(), WATCHDOG_NOTICE);
@@ -66,7 +69,7 @@ function _display_cache_warmer_log() {
       watchdog('display_cache_warmer', $message, array(), WATCHDOG_INFO);
     }
   }
-  $log = array();
+  $log['logged'] = TRUE;
 }
 
 /**
@@ -75,6 +78,6 @@ function _display_cache_warmer_log() {
  * @return mixed
  */
 function &display_cache_warmer_static() {
-  static $array;
+  static $array = array();
   return $array;
 }
