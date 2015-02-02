@@ -13,14 +13,12 @@ function display_cache_warmer_settings_form($form, &$form_state) {
   );
   $form['display_cache_warmer_wipe_out'] = array(
     '#type' => 'checkbox',
-    '#required' => TRUE,
     '#title' => t('Wipe out'),
     '#description' => 'Check if you want to delete old log records. Leave unchecked to just skip them.',
     '#default_value' => _display_cache_warmer_variable_get('wipe_out'),
   );
   $form['display_cache_warmer_debug_mode'] = array(
     '#type' => 'checkbox',
-    '#required' => TRUE,
     '#title' => t('Debug mode'),
     '#description' => 'Normally, the watchdog() is only called when there is at least one successfully warmed cache. Enable this option to call the watchdog() on each cron run.',
     '#default_value' => _display_cache_warmer_variable_get('debug_mode'),
