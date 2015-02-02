@@ -35,6 +35,7 @@ function _display_cache_warmer_variable_get($name) {
   $defaults = array(
     'max_age' => 60*60*24*30,
     'wipe_out' => TRUE,
+    'debug_mode' => FALSE,
   );
   return variable_get("display_cache_warmer_$name", $defaults[$name]);
 }
@@ -53,7 +54,7 @@ function _display_cache_warmer_log() {
   if (empty($log['completed'])) {
     watchdog('display_cache_warmer', "The cache warming was not fully completed. Execution time: $time.", array(), WATCHDOG_NOTICE);
   }
-  if (isset($log['success']) && $log['success'] > 0) {
+  if (!empty($log['debug_mode']) || (isset($log['success']) && $log['success'] > 0)) {
     $message = "Count of successfully warmed caches: {$log['success']}.";
     $fail = count($log['exceptions']);
     if ($fail > 0) {

@@ -45,6 +45,7 @@ class DisplayCacheWarmer {
     $reader = new \OSInet\Heisencache\CacheReadLogReader();
     $max_age = (int) _display_cache_warmer_variable_get('max_age');
     $wipe_out = (bool) _display_cache_warmer_variable_get('wipe_out');
+    $log['debug_mode'] = (bool) _display_cache_warmer_variable_get('debug_mode');
     $reader->query('cache_display_cache', $max_age, $wipe_out);
     while (($cache_id = $reader->getNextCacheId(TRUE)) !== FALSE) {
       try {
