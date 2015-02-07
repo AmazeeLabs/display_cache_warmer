@@ -4,6 +4,7 @@ core = 7.x
 
 dependencies[] = 'display_cache'
 dependencies[] = 'heisencache'
+dependencies[] = 'background_process'
 
 files[] = includes/DisplayCacheWarmer.inc
 files[] = includes/DisplayCacheWarmerCacheSpec.inc
