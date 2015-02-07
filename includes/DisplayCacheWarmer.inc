@@ -383,6 +383,10 @@ class DisplayCacheWarmer {
       $view = entity_view($this->cacheSpec->entityType, array($entity), $this->cacheSpec->viewMode);
       drupal_render($view);
     }
+    // Ensure that cache was generated.
+    if (!cache_get($this->cacheId)) {
+      throw new DisplayCacheWarmerException('The cache was not built for unknown reasons.', $this->cacheSpec);
+    }
     return $this;
   }
 }
