@@ -384,7 +384,7 @@ class DisplayCacheWarmer {
       drupal_render($view);
     }
     // Ensure that cache was generated.
-    if (!cache_get($this->cacheId)) {
+    if (!cache_get($this->cacheId, DISPLAY_CACHE_CACHE_BIN)) {
       throw new DisplayCacheWarmerException('The cache was not built for unknown reasons.', $this->cacheSpec);
     }
     return $this;
