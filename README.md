@@ -63,3 +63,8 @@ To not break other cron tasks execution:
     1. Use minimal difference between "Time limit" and "Stuck time" settings.
     1. Place `display_cache_warmer_cron` in a separate channel.
 1. Run every minute (`* * * * *`).
+
+## Error Handling
+    Fatal error: Class 'OSInet\Heisencache\SqlWriterSubscriber' not found in sites/all/modules/custom/heisencache/views/heisencache.views.inc
+
+Do not forget to add `$conf['cache_backends'][] = 'sites/all/modules/custom/heisencache/heisencache.inc';` to settings.local.php
