@@ -251,6 +251,12 @@ class DisplayCacheWarmer {
           }
         }
       }
+      if ($handle = background_process_current_handle()) {
+        if ($process = background_process_get_process($handle)) {
+          $process->uid = $globals_original['GLOBALS']['user']['value']->uid;
+          background_process_set_process($process->handle, $process->callback, $process->uid, $process->args, $process->token);
+        }
+      }
       return $this;
     }
 
@@ -277,16 +283,16 @@ class DisplayCacheWarmer {
     }
 
     // Proxy user.
+    $account = NULL;
     if (!empty($this->cacheSpec->userId)) {
-      $user = user_load($this->cacheSpec->userId);
-      if (!$user) {
+      $account = user_load($this->cacheSpec->userId);
+      if (!$account) {
         throw new DisplayCacheWarmerException('Cannot load user for proxy.', $this->cacheSpec);
       }
-      $GLOBALS['user'] = $user;
     }
     elseif (!empty($this->cacheSpec->userRoleIds)) {
       if (isset($this->cacheSpec->userRoleIds[DRUPAL_ANONYMOUS_RID])) {
-        $GLOBALS['user'] = drupal_anonymous_user();
+        $account = drupal_anonymous_user();
       }
       else {
         static $user_id_to_role_ids_map;
@@ -304,11 +310,24 @@ class DisplayCacheWarmer {
         if ($user_id === FALSE) {
           throw new DisplayCacheWarmerException('Cannot find a user with appropriate roles.', $this->cacheSpec);
         }
-        $user = user_load($user_id);
-        if (!$user) {
+        $account = user_load($user_id);
+        if (!$account) {
           throw new DisplayCacheWarmerException('Cannot load user.', $this->cacheSpec);
         }
-        $GLOBALS['user'] = $user;
+      }
+    }
+    if (!empty($account)) {
+      $GLOBALS['user'] = $account;
+      // The background_process module can change the user. It could be done
+      // when some code calls menu_get_item(), and then the access callback is
+      // called and the global user object is replaced.
+      /* @see background_process_service_access() */
+      // To avoid this, temporary replace the uid of the process.
+      if ($handle = background_process_current_handle()) {
+        if ($process = background_process_get_process($handle)) {
+          $process->uid = $account->uid;
+          background_process_set_process($process->handle, $process->callback, $process->uid, $process->args, $process->token);
+        }
       }
     }
 
