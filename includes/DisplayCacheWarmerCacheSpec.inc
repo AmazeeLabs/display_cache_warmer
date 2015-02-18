@@ -12,6 +12,8 @@ class DisplayCacheWarmerCacheSpec {
   public $viewMode;
   public $element;
 
+  public $contentLanguage;
+
   public $domainId;
   public $domainVariantId;
 

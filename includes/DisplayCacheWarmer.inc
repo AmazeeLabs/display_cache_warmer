@@ -123,6 +123,8 @@ class DisplayCacheWarmer {
     $pattern .= '(:([^:]+))';
     // Element ("entity" or field name).
     $pattern .= "(:([^:]+))";
+    // Content language (custom one that comes from $_GET["content_language"]).
+    $pattern .= "(:cl.([a-zA-Z_-]+))?";
     // Domain ID.
     $pattern .= '(:d.([0-9]+))?';
     // Domain variant ID.
@@ -152,6 +154,8 @@ class DisplayCacheWarmer {
       $cache_spec->viewMode,
       ,
       $cache_spec->element,
+      ,
+      $cache_spec->contentLanguage,
       ,
       $cache_spec->domainId,
       ,
@@ -271,6 +275,10 @@ class DisplayCacheWarmer {
         '_SERVER' => array(
           'REQUEST_METHOD' => 0,
         ),
+        '_GET' => array(
+          'content_language' => 0,
+          'content_language_nid' => 0,
+        ),
       );
       foreach ($globals_original as $global_name => $globals) {
         foreach ($globals as $name => $_) {
@@ -367,6 +375,12 @@ class DisplayCacheWarmer {
     // We need it to be GET or HEAD. Otherwise, the render cache won't be set.
     /* @see drupal_render_cache_set() */
     $_SERVER['REQUEST_METHOD'] = 'GET';
+
+    // Proxy custom content language.
+    if (!empty($this->cacheSpec->contentLanguage)) {
+      $_GET['content_language'] = $this->cacheSpec->contentLanguage;
+      $_GET['content_language_nid'] = $this->cacheSpec->entityId;
+    }
 
     return $this;
   }
