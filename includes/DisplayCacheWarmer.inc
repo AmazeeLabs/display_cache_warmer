@@ -37,6 +37,10 @@ class DisplayCacheWarmer {
    * Warms all caches.
    */
   public static function warmCaches() {
+    // We'll release the lock in the _display_cache_warmer_log().
+    if (!lock_acquire('display_cache_warmer', 60*60*24)) {
+      return;
+    }
     register_shutdown_function('_display_cache_warmer_log');
     $log =& display_cache_warmer_static();
     timer_start('display_cache_warmer');
