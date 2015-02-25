@@ -4,6 +4,13 @@
  * Settings form callback.
  */
 function display_cache_warmer_settings_form($form, &$form_state) {
+  $form['display_cache_warmer_max_count_per_cron_run'] = array(
+    '#type' => 'textfield',
+    '#required' => TRUE,
+    '#title' => t('Max count per cron run'),
+    '#description' => 'The maximum number of caches that can be successfully warmed per one cron run. Zero means no limit.',
+    '#default_value' => _display_cache_warmer_variable_get('max_count_per_cron_run'),
+  );
   $form['display_cache_warmer_max_age'] = array(
     '#type' => 'textfield',
     '#required' => TRUE,
@@ -30,9 +37,15 @@ function display_cache_warmer_settings_form($form, &$form_state) {
  * Validation handler for the settings form.
  */
 function display_cache_warmer_settings_form_validate(&$form, &$form_state) {
-  if (!ctype_digit($form_state['values']['display_cache_warmer_max_age'])) {
-    form_error($form['display_cache_warmer_max_age'], t('Only numbers are allowed in %field.', array(
-      '%field' => $form['display_cache_warmer_max_age']['#title'],
-    )));
+  $numeric = array(
+    'display_cache_warmer_max_count_per_cron_run',
+    'display_cache_warmer_max_age',
+  );
+  foreach ($numeric as $name) {
+    if (!ctype_digit($form_state['values'][$name])) {
+      form_error($form[$name], t('Only numbers are allowed in %field.', array(
+        '%field' => $form[$name]['#title'],
+      )));
+    }
   }
 }

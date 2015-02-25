@@ -20,7 +20,7 @@ function display_cache_warmer_menu() {
  * Implements hook_cron().
  */
 function display_cache_warmer_cron() {
-  DisplayCacheWarmer::warmCaches();
+  DisplayCacheWarmer::warmCaches(_display_cache_warmer_variable_get('max_count_per_cron_run'));
 }
 
 /**
@@ -33,6 +33,7 @@ function display_cache_warmer_cron() {
  */
 function _display_cache_warmer_variable_get($name) {
   $defaults = array(
+    'max_count_per_cron_run' => 300,
     'max_age' => 60*60*24*30,
     'wipe_out' => TRUE,
     'debug_mode' => FALSE,

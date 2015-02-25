@@ -34,9 +34,13 @@ class DisplayCacheWarmer {
   }
 
   /**
-   * Warms all caches.
+   * Warms caches.
+   *
+   * @param int $max_count
+   *   The maximum number of caches that can be successfully warmed. Zero means
+   *   no limit.
    */
-  public static function warmCaches() {
+  public static function warmCaches($max_count = 0) {
     // We'll release the lock in the _display_cache_warmer_log().
     if (!lock_acquire('display_cache_warmer', 60*60*24)) {
       return;
@@ -51,7 +55,7 @@ class DisplayCacheWarmer {
     $wipe_out = (bool) _display_cache_warmer_variable_get('wipe_out');
     $log['debug_mode'] = (bool) _display_cache_warmer_variable_get('debug_mode');
     $reader->query('cache_display_cache', $max_age, $wipe_out);
-    while (($cache_id = $reader->getNextCacheId(TRUE)) !== FALSE) {
+    while ((($cache_id = $reader->getNextCacheId(TRUE)) !== FALSE) && ($log['success'] < $max_count)) {
       try {
         self::warmCache($cache_id);
         $log['success']++;
