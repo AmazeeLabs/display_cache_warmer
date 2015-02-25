@@ -255,10 +255,12 @@ class DisplayCacheWarmer {
           }
         }
       }
-      if ($handle = background_process_current_handle()) {
-        if ($process = background_process_get_process($handle)) {
-          $process->uid = $globals_original['GLOBALS']['user']['value']->uid;
-          background_process_set_process($process->handle, $process->callback, $process->uid, $process->args, $process->token);
+      if (module_exists('background_process')) {
+        if ($handle = background_process_current_handle()) {
+          if ($process = background_process_get_process($handle)) {
+            $process->uid = $globals_original['GLOBALS']['user']['value']->uid;
+            background_process_set_process($process->handle, $process->callback, $process->uid, $process->args, $process->token);
+          }
         }
       }
       return $this;
@@ -322,15 +324,17 @@ class DisplayCacheWarmer {
     }
     if (!empty($account)) {
       $GLOBALS['user'] = $account;
-      // The background_process module can change the user. It could be done
-      // when some code calls menu_get_item(), and then the access callback is
-      // called and the global user object is replaced.
-      /* @see background_process_service_access() */
-      // To avoid this, temporary replace the uid of the process.
-      if ($handle = background_process_current_handle()) {
-        if ($process = background_process_get_process($handle)) {
-          $process->uid = $account->uid;
-          background_process_set_process($process->handle, $process->callback, $process->uid, $process->args, $process->token);
+      if (module_exists('background_process')) {
+        // The background_process module can change the user. It could be done
+        // when some code calls menu_get_item(), and then the access callback is
+        // called and the global user object is replaced.
+        /* @see background_process_service_access() */
+        // To avoid this, temporary replace the uid of the process.
+        if ($handle = background_process_current_handle()) {
+          if ($process = background_process_get_process($handle)) {
+            $process->uid = $account->uid;
+            background_process_set_process($process->handle, $process->callback, $process->uid, $process->args, $process->token);
+          }
         }
       }
     }
