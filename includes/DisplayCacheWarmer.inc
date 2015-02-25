@@ -34,9 +34,13 @@ class DisplayCacheWarmer {
   }
 
   /**
-   * Warms all caches.
+   * Warms caches.
+   *
+   * @param int $max_count
+   *   The maximum number of caches that can be successfully warmed. Zero means
+   *   no limit.
    */
-  public static function warmCaches() {
+  public static function warmCaches($max_count = 0) {
     // We'll release the lock in the _display_cache_warmer_log().
     if (!lock_acquire('display_cache_warmer', 60*60*24)) {
       return;
@@ -51,7 +55,7 @@ class DisplayCacheWarmer {
     $wipe_out = (bool) _display_cache_warmer_variable_get('wipe_out');
     $log['debug_mode'] = (bool) _display_cache_warmer_variable_get('debug_mode');
     $reader->query('cache_display_cache', $max_age, $wipe_out);
-    while (($cache_id = $reader->getNextCacheId(TRUE)) !== FALSE) {
+    while ((($cache_id = $reader->getNextCacheId(TRUE)) !== FALSE) && ($log['success'] < $max_count)) {
       try {
         self::warmCache($cache_id);
         $log['success']++;
@@ -259,10 +263,12 @@ class DisplayCacheWarmer {
           }
         }
       }
-      if ($handle = background_process_current_handle()) {
-        if ($process = background_process_get_process($handle)) {
-          $process->uid = $globals_original['GLOBALS']['user']['value']->uid;
-          background_process_set_process($process->handle, $process->callback, $process->uid, $process->args, $process->token);
+      if (module_exists('background_process')) {
+        if ($handle = background_process_current_handle()) {
+          if ($process = background_process_get_process($handle)) {
+            $process->uid = $globals_original['GLOBALS']['user']['value']->uid;
+            background_process_set_process($process->handle, $process->callback, $process->uid, $process->args, $process->token);
+          }
         }
       }
       return $this;
@@ -330,15 +336,17 @@ class DisplayCacheWarmer {
     }
     if (!empty($account)) {
       $GLOBALS['user'] = $account;
-      // The background_process module can change the user. It could be done
-      // when some code calls menu_get_item(), and then the access callback is
-      // called and the global user object is replaced.
-      /* @see background_process_service_access() */
-      // To avoid this, temporary replace the uid of the process.
-      if ($handle = background_process_current_handle()) {
-        if ($process = background_process_get_process($handle)) {
-          $process->uid = $account->uid;
-          background_process_set_process($process->handle, $process->callback, $process->uid, $process->args, $process->token);
+      if (module_exists('background_process')) {
+        // The background_process module can change the user. It could be done
+        // when some code calls menu_get_item(), and then the access callback is
+        // called and the global user object is replaced.
+        /* @see background_process_service_access() */
+        // To avoid this, temporary replace the uid of the process.
+        if ($handle = background_process_current_handle()) {
+          if ($process = background_process_get_process($handle)) {
+            $process->uid = $account->uid;
+            background_process_set_process($process->handle, $process->callback, $process->uid, $process->args, $process->token);
+          }
         }
       }
     }
