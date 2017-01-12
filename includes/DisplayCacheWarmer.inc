@@ -393,6 +393,7 @@ class DisplayCacheWarmer {
       $_GET['content_language'] = $this->cacheSpec->contentLanguage;
       $_GET['content_language_nid'] = $this->cacheSpec->entityId;
     }
+    $_GET['cache_warmer'] = TRUE;
 
     return $this;
   }

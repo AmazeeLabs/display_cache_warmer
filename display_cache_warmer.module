@@ -84,3 +84,21 @@ function &display_cache_warmer_static() {
   static $array = array();
   return $array;
 }
+
+/**
+ * Implements hook_node_view_alter().
+ */
+function display_cache_warmer_node_view_alter(&$build) {
+  // In case we are warming up the cache, we need to manually add the comments
+  // on the node view because the comment_node_view() will add the comments only
+  // if the current request belongs to the full node view page. So, what we do
+  // here is just to remove that condition. See the last few lines from
+  // comment_node_view().
+  // We do this only if we are actually warming the cache.
+  if (!empty($_GET['cache_warmer'])) {
+    $node = $build['#node'];
+    if (empty($build['comments']) && $node->comment != COMMENT_NODE_HIDDEN && $node->comment && $build['#view_mode'] == 'full' && empty($node->in_preview)) {
+      $build['comments'] = comment_node_page_additions($node);
+    }
+  }
+}
